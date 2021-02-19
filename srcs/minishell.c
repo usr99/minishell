@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/16 14:48:12 by mamartin          #+#    #+#             */
-/*   Updated: 2021/01/27 15:42:12 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/02/18 22:48:01 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ int			main(int ac, char **av, char **env)
 	{
 		cmd_line[ret - 1] = '\0';
 		ast = read_cmd(cmd_line);
-		if (!exec_cmd(ast, lst_env))
-			break;
+		if (!exec_ast(ast, &lst_env))
+			break ;
 		else
 			btree_clear(&ast, &free_token);
 		print_prompt();
@@ -50,7 +50,11 @@ void		handle_signal(int signal)
 
 void		print_prompt(void)
 {
-	ft_putstr_fd("\033[01;34m", STDOUT_FILENO);
-	ft_putstr_fd("$> ", STDOUT_FILENO);
+	char	cwd[1024];
+
+	ft_putstr_fd("\033[01;34m""\n", STDOUT_FILENO);
+	getcwd(cwd, sizeof(cwd));
+	ft_putstr_fd(cwd, STDOUT_FILENO);
+	ft_putstr_fd("\n$> ", STDOUT_FILENO);
 	ft_putstr_fd("\033[00m", STDOUT_FILENO);
 }

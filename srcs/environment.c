@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 15:28:24 by mamartin          #+#    #+#             */
-/*   Updated: 2021/01/27 15:28:44 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/02/08 16:55:14 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_list		*dup_env(char **env)
+t_list	*dup_env(char **env)
 {
 	t_list	*begin;
 	t_list	*new;

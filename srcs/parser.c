@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 23:54:01 by mamartin          #+#    #+#             */
-/*   Updated: 2021/01/23 02:09:40 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/02/14 17:07:51 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@ t_btree	*parser(t_list *lexer)
 	t_btree	*ast;
 
 	ast = NULL;
+	if (!lexer)
+	{
+		ast = btree_create_node(NULL);
+		return (ast);
+	}
 	get_node(&ast, lexer);
 	if (!ast)
 		return (NULL);
@@ -38,7 +43,7 @@ t_btree	*get_node(t_btree **root, t_list *lexer)
 	node = btree_create_node(lexer->content);
 	if (!node)
 	{
-		btree_clear(*root, NULL);
+		btree_clear(root, NULL);
 		return (NULL);
 	}
 	if (*root == NULL)
