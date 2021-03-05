@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 21:24:30 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/19 10:23:04 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/01 20:07:37 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@ int	exec_ast(t_btree *ast, t_list **env)
 		return (0);
 	if (ast->item == NULL)
 		return (1);
-	if (!expander(ast, *env))
-		return (0);
 	if (!exec_node(ast, env))
 		return (0);
 	return (1);
@@ -30,9 +28,17 @@ int	exec_node(t_btree *node, t_list **env)
 	t_token	*token;
 	int		ret;
 
+	if (!node)
+		return (1);
 	token = node->item;
+	if (!expander(node, *env))
+		return (0);
 	if (token->type >= TK_INPUT && token->type <= TK_OUTPUT_APPEND)
+	{
 		ret = handle_redirect(token->type, node, env);
+		if (!exec_node(node->right, env))
+			return (0);
+	}
 	else if (token->type == TK_PIPE)
 		ret = handle_pipe(node, env);
 	else if (token->type == TK_WORD)
@@ -54,7 +60,7 @@ int	handle_redirect(t_tk_type type, t_btree *node, t_list **env)
 	int	fd;
 
 	std_fd = STDOUT_FILENO;
-	fd = open_file(type, ((t_token *)(node->right->item))->data);
+	fd = open_file(type, ((t_token *)(node->item))->data);
 	if (fd == -1)
 	{
 		ft_putstr_fd(strerror(errno), STDERR_FILENO);

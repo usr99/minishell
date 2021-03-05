@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/16 14:33:29 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/17 19:04:43 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/01 20:08:46 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,11 @@ t_list			*create_token_link(t_tk_type type, char *data);
 */
 
 t_btree			*parser(t_list *lexer);
-void			create_ast(t_btree **root, t_list *lexer);
-t_btree			*get_node(t_btree **root, t_list *lexer);
-int				add_next_node(t_btree **root, t_btree *prev, t_list *lexer);
+
+int				create_ast(t_btree **node, t_list *lexer);
+t_token			*get_highest_token(t_list *lexer, int *index);
+int				get_token_rank(t_token *token);
+t_list			*copy_lexer(t_list *lexer, int index);
 int				is_operator(t_token *token);
 
 /*

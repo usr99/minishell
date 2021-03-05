@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:42:17 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/19 00:29:37 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/02/21 17:59:19 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ char	**get_args(t_btree *node)
 			return (NULL);
 		}
 		ft_lstadd_back(&args, new);
-		node = node->left;
+		node = node->right;
 	}
 	array = lst_to_array(args);
 	ft_lstclear(&args, NULL);

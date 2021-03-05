@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/20 17:40:28 by mamartin          #+#    #+#             */
-/*   Updated: 2021/01/26 16:45:29 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/02/21 17:07:14 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,17 @@ t_list		*get_token(char *cmd, int *pos)
 		data = get_token_data(cmd + *pos, type);
 	else if (type == TK_WORD || type == TK_ENV_VAR)
 		data = get_token_data(cmd + *pos, 0);
-	if (!data)
+	else if (type >= TK_INPUT && type <= TK_OUTPUT_APPEND)
 	{
+		(*pos)++;
 		if (type == TK_OUTPUT_APPEND)
-			*pos += 2;
-		else
-			*pos += 1;
+			(*pos)++;
+		while (cmd[*pos] == ' ' && cmd[*pos])
+			(*pos)++;
+		data = get_token_data(cmd + *pos, 0);
 	}
+	if (!data)
+		*pos += 1;
 	else
 		*pos += ft_strlen(data);
 	return (create_token_link(type, data));
@@ -106,7 +110,8 @@ t_list		*create_token_link(t_tk_type type, char *data)
 	t_token	*token;
 	t_list	*new;
 
-	if ((type == 34 || type == 36 || type == 39 || type == TK_WORD) && !data)
+	if ((type == 34 || type == 36 || type == 39 || !type ||
+		(type <= 60 && type >= 62)) && !data)
 		return (NULL);
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)

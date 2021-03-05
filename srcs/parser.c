@@ -6,11 +6,23 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 23:54:01 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/14 17:07:51 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/02/21 17:58:50 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+void	print_ast(t_btree *root)
+{
+	t_token	*tk;
+
+	if (!root)
+		return ;
+	tk = root->item;
+	printf("%d %s\n", tk->type, tk->data);
+	print_ast(root->left);
+	print_ast(root->right);
+}
 
 t_btree	*parser(t_list *lexer)
 {
@@ -22,61 +34,105 @@ t_btree	*parser(t_list *lexer)
 		ast = btree_create_node(NULL);
 		return (ast);
 	}
-	get_node(&ast, lexer);
-	if (!ast)
-		return (NULL);
-	lexer = lexer->next;
-	if (lexer)
+
+	if (!create_ast(&ast, lexer))
 	{
-		if (!add_next_node(&ast, ast, lexer))
-			ft_lstclear(&lexer, &free_token);
-		else
-			ft_lstclear(&lexer, NULL);
-	}
+		btree_clear(&ast, NULL);
+		ast = NULL;
+		ft_lstclear(&lexer, &free_token);
+	}	
+	else
+		ft_lstclear(&lexer, NULL);
 	return (ast);
 }
 
-t_btree	*get_node(t_btree **root, t_list *lexer)
+int		create_ast(t_btree **node, t_list *lexer)
 {
-	t_btree	*node;
+	t_token	*tk;
+	t_list	*lst;
+	int		index;
 
-	node = btree_create_node(lexer->content);
-	if (!node)
+	if (!lexer)
+		return (1);
+	tk = get_highest_token(lexer, &index);
+	*node = btree_create_node(tk);
+	if (*node == NULL)
+		return (0);
+	if (index != 0)
 	{
-		btree_clear(root, NULL);
-		return (NULL);
+		lst = copy_lexer(lexer, index);
+		if (!lst)
+			return (0);
+		if (!create_ast(&(*node)->left, lst))
+			return (0);
+		ft_lstclear(&lst, NULL);
 	}
-	if (*root == NULL)
-		*root = node;
-	return (node);
+	while (index-- > -1 && lexer)
+		lexer = lexer->next;
+	if (!create_ast(&(*node)->right, lexer))
+		return (0);
+	return (1);
 }
 
-int		add_next_node(t_btree **root, t_btree *prev, t_list *lexer)
+t_token	*get_highest_token(t_list *lexer, int *index)
 {
-	t_btree	*node;
+	t_token	*curr;	
+	t_token	*tmp;
+	int		i;
 
-	node = get_node(root, lexer);
-	if (!node)
-		return (0);
-	if (is_operator(node->item))
+	i = 0;
+	tmp = NULL;
+	while (lexer)
 	{
-		node->left = *root;
-		*root = node;
+		curr = lexer->content;
+		if (get_token_rank(tmp) < get_token_rank(curr))
+		{
+			*index = i;
+			tmp = curr;
+			if (curr->type == TK_SEMICOLON)
+				return (tmp);
+		}
+		i++;
+		lexer = lexer->next;
 	}
+	return (tmp);
+}
+
+int		get_token_rank(t_token *token)
+{
+	if (token == NULL)
+		return (-1);
+	else if (token->type == TK_SEMICOLON)
+		return (3);
+	else if (token->type == TK_PIPE)
+		return (2);
+	else if (token->type >= TK_INPUT && token->type <= TK_OUTPUT_APPEND)
+		return (1);
 	else
+		return (0);
+}
+
+t_list	*copy_lexer(t_list *lexer, int index)
+{
+	t_list	*cpy;
+	t_list	*lst;
+	int		i;
+
+	i = 0;
+	cpy = NULL;
+	while (lexer && i < index)
 	{
-		if (prev->left)
-			prev->right = node;
-		else
-			prev->left = node;
+		lst = ft_lstnew(lexer->content);
+		if (!lst)
+		{
+			ft_lstclear(&cpy, NULL);
+			return (NULL);
+		}
+		ft_lstadd_back(&cpy, lst);
+		lexer = lexer->next;
+		i++;
 	}
-	lexer = lexer->next;
-	if (lexer)
-	{
-		if (!add_next_node(root, node, lexer))
-			return (0);
-	}
-	return (1);
+	return (cpy);
 }
 
 int		is_operator(t_token *token)

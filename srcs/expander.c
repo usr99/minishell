@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 21:43:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/01/27 15:27:40 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/01 20:08:04 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,19 @@ int		expander(t_btree *ast, t_list *env)
 		if (!expand_quotes(token, env))
 			return (0);
 	}
+	else if (token->type >= 60 && token->type <= 62)
+	{
+		if (!expand_quotes(token, env))
+			return (0);
+	}
 	else if (token->type == TK_ENV_VAR)
 	{
 		if (!expand_dollar_sign(token, env))
 			return (0);
 		token->type = TK_WORD;
 	}
-	if (!expander(ast->left, env))
-		return (0);
-	if (!expander(ast->right, env))
-		return (0);
+	if (token->type == TK_WORD)
+		expander(ast->right, env);
 	return (1);
 }
 
@@ -42,20 +45,25 @@ int		expand_quotes(t_token *token, t_list *env)
 	char	*tmp;
 
 	tmp = token->data;
-	if (token->type == TK_SINGLE_QUOTE)
-		token->data = ft_strtrim(token->data, "\'");
-	else
-		token->data = ft_strtrim(token->data, "\"");
-	free(tmp);
-	if (token->data == NULL)
-		return (0);
-	if (token->type == TK_DOUBLE_QUOTE)
+	if (tmp[0] == '\'' || tmp[0] == '\"')
 	{
-		if (!expand_dollar_sign(token, env))
+		if (tmp[0] == '\'')
+			token->data = ft_strtrim(token->data, "\'");
+		else if (tmp[0] == '\"')
+		{
+			token->data = ft_strtrim(token->data, "\"");
+			if (!expand_dollar_sign(token, env))
+				return (0);
+			expand_backslash(token);
+		}
+		free(tmp);
+		if (token->data == NULL)
 			return (0);
-		expand_backslash(token);
 	}
-	token->type = TK_WORD;
+	else if (!expand_dollar_sign(token, env))
+		return (0);
+	if (!is_operator(token))
+		token->type = TK_WORD;
 	return (1);
 }
 
@@ -67,6 +75,8 @@ int		expand_dollar_sign(t_token *token, t_list *env)
 	int		i;
 
 	i = -1;
+	if (token->data == NULL)
+		return (0);
 	while (token->data[++i])
 	{
 		if (token->data[i] == '$')
