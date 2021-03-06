@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 15:28:24 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/08 16:55:14 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 15:22:13 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,9 @@ t_list	*dup_env(char **env)
 
 char	*get_environment_var(t_list *env, char *name, int *length)
 {
+	char	*varname;
 	int		i;
+	int		j;
 
 	if (*name == '$')
 	{
@@ -45,7 +47,11 @@ char	*get_environment_var(t_list *env, char *name, int *length)
 			i++;
 		while (env)
 		{
-			if (!ft_strncmp(env->content, name + 1, i - 1))
+			j = 0;
+			varname = (char *)env->content;
+			while (varname[j] != '=' && varname[j])
+				j++;
+			if (!ft_strncmp(env->content, name + 1, j))
 			{
 				*length = i;
 				return (env->content + i);

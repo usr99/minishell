@@ -6,23 +6,11 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 23:54:01 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/21 17:58:50 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 00:07:08 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
-void	print_ast(t_btree *root)
-{
-	t_token	*tk;
-
-	if (!root)
-		return ;
-	tk = root->item;
-	printf("%d %s\n", tk->type, tk->data);
-	print_ast(root->left);
-	print_ast(root->right);
-}
 
 t_btree	*parser(t_list *lexer)
 {
@@ -34,13 +22,12 @@ t_btree	*parser(t_list *lexer)
 		ast = btree_create_node(NULL);
 		return (ast);
 	}
-
 	if (!create_ast(&ast, lexer))
 	{
 		btree_clear(&ast, NULL);
 		ast = NULL;
 		ft_lstclear(&lexer, &free_token);
-	}	
+	}
 	else
 		ft_lstclear(&lexer, NULL);
 	return (ast);
@@ -60,7 +47,7 @@ int		create_ast(t_btree **node, t_list *lexer)
 		return (0);
 	if (index != 0)
 	{
-		lst = copy_lexer(lexer, index);
+		lst = ft_lstdup(lexer, index);
 		if (!lst)
 			return (0);
 		if (!create_ast(&(*node)->left, lst))
@@ -76,7 +63,7 @@ int		create_ast(t_btree **node, t_list *lexer)
 
 t_token	*get_highest_token(t_list *lexer, int *index)
 {
-	t_token	*curr;	
+	t_token	*curr;
 	t_token	*tmp;
 	int		i;
 
@@ -110,29 +97,6 @@ int		get_token_rank(t_token *token)
 		return (1);
 	else
 		return (0);
-}
-
-t_list	*copy_lexer(t_list *lexer, int index)
-{
-	t_list	*cpy;
-	t_list	*lst;
-	int		i;
-
-	i = 0;
-	cpy = NULL;
-	while (lexer && i < index)
-	{
-		lst = ft_lstnew(lexer->content);
-		if (!lst)
-		{
-			ft_lstclear(&cpy, NULL);
-			return (NULL);
-		}
-		ft_lstadd_back(&cpy, lst);
-		lexer = lexer->next;
-		i++;
-	}
-	return (cpy);
 }
 
 int		is_operator(t_token *token)

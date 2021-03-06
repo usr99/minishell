@@ -1,36 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   types.h                                            :+:      :+:    :+:   */
+/*   ft_clearstr.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/20 17:45:35 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/05 23:13:53 by mamartin         ###   ########.fr       */
+/*   Created: 2021/03/06 15:32:33 by mamartin          #+#    #+#             */
+/*   Updated: 2021/03/06 15:34:17 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TYPES_H
-# define TYPES_H
+#include "./libft.h"
 
-typedef enum	e_tk_type
+char	*ft_clearstr(char *str)
 {
-	TK_WORD,
-	TK_SINGLE_QUOTE = 39,
-	TK_DOUBLE_QUOTE = 34,
-	TK_INPUT = 60,
-	TK_OUTPUT,
-	TK_OUTPUT_APPEND,
-	TK_PIPE = 124,
-	TK_ENV_VAR = 36,
-	TK_SEMICOLON = 59,
-}				t_tk_type;
+	char	*new;
 
-typedef struct	s_token
-{
-	t_tk_type	type;
-	char		*data;
-	int			*code;
-}				t_token;
-
-#endif
+	free(str);
+	new = ft_calloc(1, 1);
+	return (new);
+}

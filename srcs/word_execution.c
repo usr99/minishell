@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:42:17 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/21 17:59:19 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 00:22:42 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,16 @@ int		handle_word(t_btree *node, t_list **env)
 	envp = lst_to_array(*env);
 	if (!argv || !envp)
 		return (0);
-	builtin = is_builtin(argv[0]);
+	builtin = g_is_builtin(argv[0]);
 	if (!builtin)
 		ret = exec_program(argv, envp);
 	else
 		ret = (*builtin)(argv, env);
 	free(argv);
 	free(envp);
+	*((t_token *)(node->item))->code = 0;
+	if (ret == -1)
+		*((t_token *)(node->item))->code = 1;
 	return (ret);
 }
 
@@ -75,4 +78,22 @@ char	**lst_to_array(t_list *lst)
 		i++;
 	}
 	return (array);
+}
+
+char	**get_path(char **envp)
+{
+	char	**path;
+	int		i;
+
+	i = 0;
+	while (envp[i])
+	{
+		if (ft_strncmp("PATH", envp[i], 4) == 0)
+			break ;
+		i++;
+	}
+	if (envp[i] == NULL)
+		return (NULL);
+	path = ft_split(envp[i] + 5, ':');
+	return (path);
 }

@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 14:52:40 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/12 18:20:33 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 00:17:13 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ int	builtin_unset(char **argv, t_list **env)
 
 	if (how_many_arguments(argv) == 1)
 	{
-		ft_putstr_fd("unset: not enough arguments\n", STDERR_FILENO);
-		return (1);
+		print_error("not enough arguments", "unset");
+		return (-1);
 	}
 	i = 1;
 	while (argv[i])
@@ -61,8 +61,8 @@ int	builtin_env(char **argv, t_list **env)
 	i = 0;
 	if (how_many_arguments(argv) > 1)
 	{
-		ft_putstr_fd("env: too many arguments\n", STDERR_FILENO);
-		return (1);
+		print_error("too many arguments", "env");
+		return (-1);
 	}
 	lst = *env;
 	while (lst)
@@ -79,8 +79,8 @@ int	builtin_exit(char **argv, t_list **env)
 	(void)env;
 	if (how_many_arguments(argv) > 1)
 	{
-		ft_putstr_fd("exit: too many arguments\n", STDERR_FILENO);
-		return (1);
+		print_error("too many arguments", "exit");
+		return (-1);
 	}
 	return (0);
 }

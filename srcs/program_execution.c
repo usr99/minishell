@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 16:17:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/19 00:11:32 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 00:26:10 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@ int		exec_program(char **argv, char **envp)
 	char	**path;
 	char	*binary;
 	int		ret;
-	
+
 	if (!ft_strchr(argv[0], '/'))
 	{
 		path = get_path(envp);
 		binary = get_program_path(path, argv[0]);
 		if (!binary)
 		{
-			ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
+			print_error("command not found", "minishell");
 			if (path)
 				ft_free_map(path);
 			return (-1);
@@ -36,24 +36,6 @@ int		exec_program(char **argv, char **envp)
 	else
 		ret = fork_process(argv[0], argv, envp);
 	return (ret);
-}
-
-char	**get_path(char **envp)
-{
-	char	**path;
-	int		i;
-
-	i = 0;
-	while (envp[i])
-	{
-		if (ft_strncmp("PATH", envp[i], 4) == 0)
-			break ;
-		i++;
-	}
-	if (envp[i] == NULL)
-		return (NULL);
-	path = ft_split(envp[i] + 5, ':');
-	return (path);
 }
 
 char	*get_program_path(char **path, char *program)
@@ -95,28 +77,34 @@ int		check_binary(char *filename)
 int		fork_process(char *binary, char **argv, char **envp)
 {
 	pid_t	pid;
+	int		status;
 
 	if (!check_binary(binary))
 	{
-		ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
+		print_error("command not found", "minishell");
 		return (-1);
 	}
 	pid = fork();
 	if (pid == -1)
 	{
-		ft_putstr_fd("minishell: fork error\n", STDERR_FILENO);
+		print_error("fork error", "minishell");
 		return (-1);
 	}
 	else if (pid == 0)
-	{
-		if (execve(binary, argv, envp) == -1)
-			ft_putstr_fd("minishell: execution failed\n", STDERR_FILENO);
-		exit(EXIT_FAILURE);
-	}
+		return (exec_in_child(binary, argv, envp));
 	else
 	{
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, 0);
 		kill(pid, SIGTERM);
+		if (status != 0)
+			return (-1);
 		return (1);
 	}
+}
+
+int		exec_in_child(char *binary, char **argv, char **envp)
+{
+	if (execve(binary, argv, envp) == -1)
+		print_error("execution failed", "minishell");
+	exit(EXIT_FAILURE);
 }

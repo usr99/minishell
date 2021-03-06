@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 21:43:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/01 20:08:04 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 15:45:28 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int		expander(t_btree *ast, t_list *env)
+int		expander(t_btree *ast, t_list *env, int code)
 {
 	t_token	*token;
 
@@ -21,26 +21,26 @@ int		expander(t_btree *ast, t_list *env)
 	token = ast->item;
 	if (token->type == TK_SINGLE_QUOTE || token->type == TK_DOUBLE_QUOTE)
 	{
-		if (!expand_quotes(token, env))
+		if (!expand_quotes(token, env, code))
 			return (0);
 	}
 	else if (token->type >= 60 && token->type <= 62)
 	{
-		if (!expand_quotes(token, env))
+		if (!expand_quotes(token, env, code))
 			return (0);
 	}
 	else if (token->type == TK_ENV_VAR)
 	{
-		if (!expand_dollar_sign(token, env))
+		if (!expand_dollar_sign(token, env, code))
 			return (0);
 		token->type = TK_WORD;
 	}
 	if (token->type == TK_WORD)
-		expander(ast->right, env);
+		expander(ast->right, env, code);
 	return (1);
 }
 
-int		expand_quotes(t_token *token, t_list *env)
+int		expand_quotes(t_token *token, t_list *env, int code)
 {
 	char	*tmp;
 
@@ -52,7 +52,7 @@ int		expand_quotes(t_token *token, t_list *env)
 		else if (tmp[0] == '\"')
 		{
 			token->data = ft_strtrim(token->data, "\"");
-			if (!expand_dollar_sign(token, env))
+			if (!expand_dollar_sign(token, env, code))
 				return (0);
 			expand_backslash(token);
 		}
@@ -60,47 +60,67 @@ int		expand_quotes(t_token *token, t_list *env)
 		if (token->data == NULL)
 			return (0);
 	}
-	else if (!expand_dollar_sign(token, env))
+	else if (!expand_dollar_sign(token, env, code))
 		return (0);
 	if (!is_operator(token))
 		token->type = TK_WORD;
 	return (1);
 }
 
-int		expand_dollar_sign(t_token *token, t_list *env)
+int		expand_dollar_sign(t_token *token, t_list *env, int code)
 {
 	char	*var;
-	char	*new_data;
-	int		length;
 	int		i;
 
 	i = -1;
+	var = NULL;
 	if (token->data == NULL)
 		return (0);
 	while (token->data[++i])
 	{
 		if (token->data[i] == '$')
 		{
-			var = get_environment_var(env, token->data + i, &length);
-			if (var)
+			if (ft_strncmp(token->data + i, "$?", 2) == 0)
 			{
-				new_data = ft_strjoin(var, token->data + i + length);
-				if (!new_data)
+				var = ft_itoa(code);
+				if (!var)
 					return (0);
-				token->data[i] = '\0';
-				i += ft_strlen(var);
-				var = new_data;
-				new_data = ft_strjoin(token->data, new_data);
-				free(var);
-				if (!new_data)
-					return (0);
-				free(token->data);
-				token->data = new_data;
 			}
+			if (!replace_env_var(token, var, i, env))
+				return (0);
 		}
 		else if (token->data[i] == '\\' && token->data[i + 1] == '$')
 			i++;
 	}
+	return (1);
+}
+
+int		replace_env_var(t_token *token, char *var, int i, t_list *env)
+{
+	char	*new_data;
+	int		length;
+
+	if (var == NULL)
+		var = get_environment_var(env, token->data + i, &length);
+	else
+		length = 2;
+	if (var)
+	{
+		new_data = ft_strjoin(var, token->data + i + length);
+		if (!new_data)
+			return (0);
+		token->data[i] = '\0';
+		i += ft_strlen(var);
+		var = new_data;
+		new_data = ft_strjoin(token->data, new_data);
+		free(var);
+		free(token->data);
+		token->data = new_data;
+	}
+	else
+		token->data = ft_clearstr(token->data);
+	if (!new_data)
+		return (0);
 	return (1);
 }
 

@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:44:56 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/12 18:28:25 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/06 00:16:29 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int (*is_builtin(char *name))(char **, t_list **)
+int	(*g_is_builtin(char *name))(char **, t_list **)
 {
 	int	size;
 
@@ -73,8 +73,8 @@ int	builtin_cd(char **argv, t_list **env)
 	envp = *env;
 	if (i > 2)
 	{
-		ft_putstr_fd("cd: too many arguments\n", STDERR_FILENO);
-		return (1);
+		print_error("too many arguments", "cd");
+		return (-1);
 	}
 	else if (i == 1)
 	{
@@ -86,15 +86,18 @@ int	builtin_cd(char **argv, t_list **env)
 		}
 		if (!envp)
 		{
-			ft_putstr_fd("cd: no home directory\n", STDERR_FILENO);
-			return (1);
+			print_error("no home directory", "cd");
+			return (-1);
 		}
 		ret = chdir((char *)envp->content + 5);
 	}
 	else
 		ret = chdir(argv[1]);
 	if (ret == -1)
-		ft_putstr_fd("cd: can't open directory\n", STDERR_FILENO);
+	{
+		print_error("can't open directory", "cd");
+		return (-1);
+	}
 	return (1);
 }
 
@@ -109,8 +112,8 @@ int	builtin_pwd(char **argv, t_list **env)
 	cwd = NULL;
 	if (how_many_arguments(argv) > 1)
 	{
-		ft_putstr_fd("pwd: too many arguments\n", STDERR_FILENO);
-		return (1);
+		print_error("too many arguments", "pwd");
+		return (-1);
 	}
 	while (cwd == NULL)
 	{
