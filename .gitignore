@@ -1,7 +1,13 @@
-# Binary file
+# Binary files
 a.out
 minishell
 
 # Object files
 objs/
 *.o
+
+# libft library
+libft/libft.a
+
+# VSCode debug repertory
+.vscode/
