@@ -6,31 +6,31 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:42:17 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 00:22:42 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 18:12:44 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int		handle_word(t_btree *node, t_list **env)
+int		handle_word(t_btree *root, t_btree *node, t_list **env)
 {
-	int		(*builtin)(char **, t_list **);
 	char	**argv;
 	char	**envp;
 	int		ret;
 
-	ret = 1;
 	argv = get_args(node);
-	envp = lst_to_array(*env);
-	if (!argv || !envp)
+	if (!argv)
 		return (0);
-	builtin = g_is_builtin(argv[0]);
-	if (!builtin)
+	ret = is_builtin(root, argv, env);
+	if (ret == NOT_BUILTIN)
+	{
+		envp = lst_to_array(*env);
+		if (!envp)
+			return (0);
 		ret = exec_program(argv, envp);
-	else
-		ret = (*builtin)(argv, env);
+		free(envp);
+	}
 	free(argv);
-	free(envp);
 	*((t_token *)(node->item))->code = 0;
 	if (ret == -1)
 		*((t_token *)(node->item))->code = 1;

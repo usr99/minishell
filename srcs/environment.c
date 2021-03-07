@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 15:28:24 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 15:22:13 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 18:52:49 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,23 @@ t_list	*dup_env(char **env)
 {
 	t_list	*begin;
 	t_list	*new;
+	char	*str;
 	int		i;
 
 	i = 0;
 	begin = NULL;
 	while (env[i])
 	{
-		new = ft_lstnew(env[i]);
+		str = ft_strdup(env[i]);
+		if (!str)
+		{
+			ft_lstclear(&begin, &free);
+			exit(EXIT_FAILURE);
+		}
+		new = ft_lstnew(str);
 		if (!new)
 		{
-			ft_lstclear(&begin, NULL);
+			ft_lstclear(&begin, &free);
 			exit(EXIT_FAILURE);
 		}
 		ft_lstadd_back(&begin, new);
@@ -54,7 +61,7 @@ char	*get_environment_var(t_list *env, char *name, int *length)
 			if (!ft_strncmp(env->content, name + 1, j))
 			{
 				*length = i;
-				return (env->content + i);
+				return (ft_strdup(env->content + i));
 			}
 			env = env->next;
 		}

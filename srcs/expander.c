@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 21:43:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 15:45:28 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 21:03:21 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ int		expand_dollar_sign(t_token *token, t_list *env, int code)
 
 	i = -1;
 	var = NULL;
-	if (token->data == NULL)
-		return (0);
 	while (token->data[++i])
 	{
 		if (token->data[i] == '$')
@@ -87,6 +85,8 @@ int		expand_dollar_sign(t_token *token, t_list *env, int code)
 					return (0);
 			}
 			if (!replace_env_var(token, var, i, env))
+				return (0);
+			if (!token->data)
 				return (0);
 		}
 		else if (token->data[i] == '\\' && token->data[i + 1] == '$')
@@ -111,6 +111,7 @@ int		replace_env_var(t_token *token, char *var, int i, t_list *env)
 			return (0);
 		token->data[i] = '\0';
 		i += ft_strlen(var);
+		free(var);
 		var = new_data;
 		new_data = ft_strjoin(token->data, new_data);
 		free(var);
@@ -119,8 +120,6 @@ int		replace_env_var(t_token *token, char *var, int i, t_list *env)
 	}
 	else
 		token->data = ft_clearstr(token->data);
-	if (!new_data)
-		return (0);
 	return (1);
 }
 

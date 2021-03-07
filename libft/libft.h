@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/16 16:52:13 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 15:34:23 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 18:04:16 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,8 @@ void			btree_clear(t_btree **root, void (*del)(void *));
 **	get_next_line	-> read a line from a file descriptor
 **	ft_free_map		-> free any given 2D array ending with a NULL element
 **	ft_lstdup		-> duplicate the first *length* elements of src
-**	ft_clearstr		-> free the string pointed by str and replace it by a new empty string
+**	ft_clearstr		-> free the string pointed by str and replace it by a new
+**						empty string
 */
 
 char			*ft_itoa_base(unsigned long long nbr, char *base);
@@ -121,6 +122,5 @@ int				get_next_line(int fd, char **line);
 void			ft_free_map(char **map);
 t_list			*ft_lstdup(t_list *src, int length);
 char			*ft_clearstr(char *str);
-
 
 #endif

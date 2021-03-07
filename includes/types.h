@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/20 17:45:35 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/05 23:13:53 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 18:15:10 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,11 @@ typedef struct	s_token
 	char		*data;
 	int			*code;
 }				t_token;
+
+typedef struct	s_ast
+{
+	t_btree	*root;
+	t_btree	*node;
+}				t_ast;
 
 #endif

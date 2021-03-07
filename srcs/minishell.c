@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/16 14:48:12 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 00:11:28 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 18:39:44 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int		main(int ac, char **av, char **env)
 	signal(SIGINT, handle_signal);
 	print_prompt();
 	ret = shell_loop(lst_env);
-	ft_lstclear(&lst_env, NULL);
+	ft_lstclear(&lst_env, &free);
 	ft_putchar_fd('\n', 1);
 	return (ret);
 }

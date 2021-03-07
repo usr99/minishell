@@ -3,7 +3,7 @@ LIBFT			= libft/libft.a
 INCLUDE			= ./includes
 SRC				= minishell.c environment.c lexer.c parser.c executor.c expander.c free.c	\
 					word_execution.c builtins.c builtins2.c program_execution.c pipe.c		\
-					redirection.c
+					redirection.c builtins_utils.c
 OBJ_DIR			= objs/
 OBJ				= ${addprefix ${OBJ_DIR}, ${SRC:.c=.o}}
 CC				= gcc

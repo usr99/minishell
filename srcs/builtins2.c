@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 14:52:40 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 00:17:13 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/07 18:40:01 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,6 @@
 
 int	builtin_unset(char **argv, t_list **env)
 {
-	t_list	*lst;
-	t_list	*tmp;
-	int		size_arg;
-	int		size_var;
 	int		i;
 
 	if (how_many_arguments(argv) == 1)
@@ -28,26 +24,7 @@ int	builtin_unset(char **argv, t_list **env)
 	i = 1;
 	while (argv[i])
 	{
-		lst = *env;
-		tmp = NULL;
-		size_arg = ft_strlen(argv[i]);
-		while (lst)
-		{
-			size_var = ft_strchr(lst->content, '=') - (char *)lst->content;
-			if (size_var < size_arg)
-				size_var = size_arg;
-			if (!ft_strncmp(argv[i], (char *)lst->content, size_var))
-			{
-				if (tmp)
-					tmp->next = lst->next;
-				else
-					*env = (*env)->next;
-				ft_lstdelone(lst, NULL);
-				break ;
-			}
-			tmp = lst;
-			lst = lst->next;
-		}
+		delete_var(argv[i], env);
 		i++;
 	}
 	return (1);
@@ -74,23 +51,23 @@ int	builtin_env(char **argv, t_list **env)
 	return (1);
 }
 
-int	builtin_exit(char **argv, t_list **env)
+int	builtin_exit(t_btree *root, char **argv, t_list **env)
 {
-	(void)env;
-	if (how_many_arguments(argv) > 1)
+	int	nb_args;
+	int	exit_code;
+
+	nb_args = how_many_arguments(argv);
+	if (nb_args > 2)
 	{
 		print_error("too many arguments", "exit");
 		return (-1);
 	}
-	return (0);
-}
-
-int	how_many_arguments(char **argv)
-{
-	int	i;
-
-	i = 0;
-	while (argv[i])
-		i++;
-	return (i);
+	else if (nb_args == 1)
+		exit_code = EXIT_SUCCESS;
+	else
+		exit_code = ft_atoi(argv[1]);
+	btree_clear(&root, &free_token);
+	ft_lstclear(env, &free);
+	free(argv);
+	exit(exit_code);
 }
