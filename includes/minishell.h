@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/16 14:33:29 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:44:06 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 22:38:00 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void			print_error(char *message, char *name, char *cmd);
 
 t_list			*dup_env(char **env);
 char			*get_environment_var(t_list *env, char *name, int *length);
+void			sort_alpha_lst(t_list **lst);
 
 /*
 **	LEXER FUNCTIONS
@@ -67,19 +68,19 @@ void			expand_backslash(t_token *token);
 **	EXECUTOR FUNCTIONS
 */
 
-int				exec_ast(t_btree *ast, t_list **env, int *errcode);
-int				exec_node(t_btree *root, t_btree *node, t_list **env,
+int				exec_ast(t_btree *ast, t_env *vars, int *errcode);
+int				exec_node(t_btree *root, t_btree *node, t_env *vars,
 					int *errcode);
 
-int				handle_redirect(t_btree *root, t_btree *node, t_list **env);
+int				handle_redirect(t_btree *root, t_btree *node, t_env *vars);
 int				open_file(t_token *token, int *std_fd);
 int				my_dup(int fd1, int fd2, t_token *token);
 
-int				handle_pipe(t_btree *root, t_btree *node, t_list **env);
-int				pipe_child(t_ast ast, t_list **env, int pipe[2]);
-int				pipe_parent(t_ast ast, t_list **env, int pipe[2], int pid);
+int				handle_pipe(t_btree *root, t_btree *node, t_env *vars);
+int				pipe_child(t_ast ast, t_env *vars, int pipe[2]);
+int				pipe_parent(t_ast ast, t_env *vars, int pipe[2], int pid);
 
-int				handle_word(t_btree *root, t_btree *node, t_list **env);
+int				handle_word(t_btree *root, t_btree *node, t_env *vars);
 char			**get_args(t_btree *node);
 char			**lst_to_array(t_list *lst);
 char			**get_path(char **envp);
@@ -94,19 +95,20 @@ int				exec_in_child(char *binary, char **argv, char **envp);
 **	BUILT-IN FUNCTIONS
 */
 
-int				builtin_echo(char **argv, t_list **env);
-int				builtin_cd(char **argv, t_list **env);
-int				builtin_pwd(char **argv, t_list **env);
-int				builtin_export(char **argv, t_list **env);
+int				builtin_echo(char **argv);
+int				builtin_cd(char **argv);
+int				builtin_pwd(char **argv);
+int				builtin_export(char **argv, t_env *vars);
 
-int				builtin_unset(char **argv, t_list **env);
+int				builtin_unset(char **argv, t_env *vars);
 int				builtin_env(char **argv, t_list **env);
-int				builtin_exit(t_btree *root, char **argv, t_list **env);
+int				builtin_exit(t_btree *root, char **argv, t_env *vars);
 
-int				is_builtin(t_btree *root, char **argv, t_list **env);
+int				is_builtin(t_btree *root, char **argv, t_env *vars);
 int				how_many_arguments(char **argv);
 int				get_pwd(char **cwd);
 void			delete_var(char *argv, t_list **env);
+int				create_var(char *arg, t_list *env);
 
 /*
 **	FREE FUNCTIONS

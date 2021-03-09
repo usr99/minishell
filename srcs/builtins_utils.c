@@ -6,31 +6,31 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/07 16:30:10 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 20:06:57 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 22:42:19 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int		is_builtin(t_btree *root, char **argv, t_list **env)
+int		is_builtin(t_btree *root, char **argv, t_env *vars)
 {
 	int	size;
 
 	size = ft_strlen(argv[0]);
 	if (ft_strncmp(argv[0], "echo", size) == 0)
-		return (builtin_echo(argv, env));
+		return (builtin_echo(argv));
 	else if (ft_strncmp(argv[0], "cd", size) == 0)
-		return (builtin_cd(argv, env));
+		return (builtin_cd(argv));
 	else if (ft_strncmp(argv[0], "pwd", size) == 0)
-		return (builtin_pwd(argv, env));
+		return (builtin_pwd(argv));
 	else if (ft_strncmp(argv[0], "export", size) == 0)
-		return (builtin_export(argv, env));
+		return (builtin_export(argv, vars));
 	else if (ft_strncmp(argv[0], "unset", size) == 0)
-		return (builtin_unset(argv, env));
+		return (builtin_unset(argv, vars));
 	else if (ft_strncmp(argv[0], "env", size) == 0)
-		return (builtin_env(argv, env));
+		return (builtin_env(argv, &vars->env));
 	else if (ft_strncmp(argv[0], "exit", size) == 0)
-		return (builtin_exit(root, argv, env));
+		return (builtin_exit(root, argv, vars));
 	else
 		return (NOT_BUILTIN);
 }
@@ -96,4 +96,22 @@ void	delete_var(char *argv, t_list **env)
 		tmp = lst;
 		lst = lst->next;
 	}
+}
+
+int		create_var(char *arg, t_list *env)
+{
+	char	*str;
+	t_list	*new;
+
+	if (ft_strchr(arg, '=') == NULL)
+		str = ft_strjoin(arg, "=\'\'");
+	else
+		str = ft_strdup(arg);
+	if (!str)
+		return (0);
+	new = ft_lstnew(str);
+	if (!new)
+		return (0);
+	ft_lstlast(env)->next = new;
+	return (1);
 }

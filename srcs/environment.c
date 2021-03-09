@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 15:28:24 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 18:52:49 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 22:11:38 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,4 +67,37 @@ char	*get_environment_var(t_list *env, char *name, int *length)
 		}
 	}
 	return (NULL);
+}
+
+void	useless_func(t_list **prev, t_list **curr)
+{
+	*prev = *curr;
+	*curr = (*curr)->next;
+}
+
+void	sort_alpha_lst(t_list **lst)
+{
+	t_list	*curr;
+	t_list	*prev;
+	t_list	*tmp;
+
+	curr = *lst;
+	prev = NULL;
+	while (curr->next)
+	{
+		tmp = curr->next;
+		if (ft_strcmp(curr->content, tmp->content) > 0)
+		{
+			curr->next = tmp->next;
+			tmp->next = curr;
+			if (prev)
+				prev->next = tmp;
+			else
+				*lst = tmp;
+			curr = *lst;
+			prev = NULL;
+		}
+		else
+			useless_func(&prev, &curr);
+	}
 }

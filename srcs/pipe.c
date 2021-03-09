@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 16:14:33 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:24:42 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 21:42:30 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	handle_pipe(t_btree *root, t_btree *node, t_list **env)
+int	handle_pipe(t_btree *root, t_btree *node, t_env *vars)
 {
 	t_ast	ast;
 	pid_t	pid;
@@ -33,12 +33,12 @@ int	handle_pipe(t_btree *root, t_btree *node, t_list **env)
 		return (-1);
 	}
 	else if (pid == 0)
-		return (pipe_child(ast, env, p));
+		return (pipe_child(ast, vars, p));
 	else
-		return (pipe_parent(ast, env, p, pid));
+		return (pipe_parent(ast, vars, p, pid));
 }
 
-int	pipe_child(t_ast ast, t_list **env, int pipe[2])
+int	pipe_child(t_ast ast, t_env *vars, int pipe[2])
 {
 	t_token	*token;
 	int		tmp_fd;
@@ -50,14 +50,14 @@ int	pipe_child(t_ast ast, t_list **env, int pipe[2])
 	if (my_dup(pipe[1], STDOUT_FILENO, token) == -1)
 		exit(EXIT_ERR);
 	close(pipe[1]);
-	if (!exec_node(ast.root, ast.node->left, env, token->code))
+	if (!exec_node(ast.root, ast.node->left, vars, token->code))
 		exit(EXIT_FAILURE);
 	if (my_dup(tmp_fd, STDOUT_FILENO, token) == -1)
 		exit(EXIT_ERR);
 	exit(EXIT_SUCCESS);
 }
 
-int	pipe_parent(t_ast ast, t_list **env, int pipe[2], int pid)
+int	pipe_parent(t_ast ast, t_env *vars, int pipe[2], int pid)
 {
 	t_token	*token;
 	int		status;
@@ -76,7 +76,7 @@ int	pipe_parent(t_ast ast, t_list **env, int pipe[2], int pid)
 	if (my_dup(pipe[0], STDIN_FILENO, token) == -1)
 		return (-1);
 	close(pipe[0]);
-	if (!exec_node(ast.root, ast.node->right, env, token->code))
+	if (!exec_node(ast.root, ast.node->right, vars, token->code))
 		return (0);
 	if (my_dup(tmp_fd, STDIN_FILENO, token) == -1)
 		return (-1);

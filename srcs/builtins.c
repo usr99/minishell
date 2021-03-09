@@ -6,18 +6,17 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:44:56 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:23:25 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 22:37:14 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	builtin_echo(char **argv, t_list **env)
+int	builtin_echo(char **argv)
 {
 	int	newline;
 	int	i;
 
-	(void)env;
 	i = 1;
 	newline = 1;
 	if (how_many_arguments(argv) > 1)
@@ -40,11 +39,10 @@ int	builtin_echo(char **argv, t_list **env)
 	return (1);
 }
 
-int	builtin_cd(char **argv, t_list **env)
+int	builtin_cd(char **argv)
 {
 	int		i;
 
-	(void)env;
 	i = how_many_arguments(argv);
 	if (i > 2)
 	{
@@ -67,11 +65,10 @@ int	builtin_cd(char **argv, t_list **env)
 	}
 }
 
-int	builtin_pwd(char **argv, t_list **env)
+int	builtin_pwd(char **argv)
 {
 	char	*cwd;
 
-	(void)env;
 	if (how_many_arguments(argv) > 1)
 	{
 		print_error("too many arguments", "pwd", NULL);
@@ -91,29 +88,27 @@ int	builtin_pwd(char **argv, t_list **env)
 	return (1);
 }
 
-int	builtin_export(char **argv, t_list **env)
+int	builtin_export(char **argv, t_env *vars)
 {
-	t_list	*new;
-	char	*str;
 	int		i;
 
 	i = 1;
 	if (how_many_arguments(argv) == 1)
-		builtin_env(argv, env);
+	{
+		sort_alpha_lst(&vars->export);
+		builtin_env(argv, &vars->export);
+	}
 	else
 	{
 		while (argv[i])
 		{
-			if (ft_strchr(argv[i], '=') == NULL)
-				str = ft_strjoin(argv[i], "=\'\'");
-			else
-				str = ft_strdup(argv[i]);
-			if (!str)
+			if (!create_var(argv[i], vars->export))
 				return (0);
-			new = ft_lstnew(str);
-			if (!new)
-				return (0);
-			ft_lstlast(*env)->next = new;
+			if (ft_strchr(argv[i], '=') != NULL)
+			{
+				if (!create_var(argv[i], vars->env))
+					return (0);
+			}
 			i++;
 		}
 	}

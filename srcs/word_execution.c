@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:42:17 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 18:12:44 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 21:43:47 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int		handle_word(t_btree *root, t_btree *node, t_list **env)
+int		handle_word(t_btree *root, t_btree *node, t_env *vars)
 {
 	char	**argv;
 	char	**envp;
@@ -21,10 +21,10 @@ int		handle_word(t_btree *root, t_btree *node, t_list **env)
 	argv = get_args(node);
 	if (!argv)
 		return (0);
-	ret = is_builtin(root, argv, env);
+	ret = is_builtin(root, argv, vars);
 	if (ret == NOT_BUILTIN)
 	{
-		envp = lst_to_array(*env);
+		envp = lst_to_array(vars->env);
 		if (!envp)
 			return (0);
 		ret = exec_program(argv, envp);

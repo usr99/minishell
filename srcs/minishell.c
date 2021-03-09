@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/16 14:48:12 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:44:03 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 21:41:21 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,13 @@ int		main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
-
 	vars.env = dup_env(env);
 	vars.export = dup_env(env);
-	
 	signal(SIGINT, handle_signal);
 	print_prompt();
 	ret = shell_loop(vars);
-	ft_lstclear(&lst_env, &free);
+	ft_lstclear(&vars.env, &free);
+	ft_lstclear(&vars.export, &free);
 	ft_putchar_fd('\n', 1);
 	return (ret);
 }
@@ -45,7 +44,7 @@ int		shell_loop(t_env vars)
 	{
 		cmd_line[ret - 1] = '\0';
 		ast = read_cmd(cmd_line);
-		ret = exec_ast(ast, &lst_env, &g_exit_code);
+		ret = exec_ast(ast, &vars, &g_exit_code);
 		btree_clear(&ast, &free_token);
 		if (!ret)
 			return (EXIT_FAILURE);

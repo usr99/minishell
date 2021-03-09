@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 16:13:28 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:25:05 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 21:42:49 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	handle_redirect(t_btree *root, t_btree *node, t_list **env)
+int	handle_redirect(t_btree *root, t_btree *node, t_env *vars)
 {
 	t_token	*token;
 	int		std_fd;
@@ -27,14 +27,14 @@ int	handle_redirect(t_btree *root, t_btree *node, t_list **env)
 		return (-1);
 	if (my_dup(fd, std_fd, token) == -1)
 		return (-1);
-	if (!exec_node(root, node->left, env, token->code))
+	if (!exec_node(root, node->left, vars, token->code))
 		return (0);
 	close(fd);
 	if (my_dup(std_save, std_fd, token) == -1)
 		return (-1);
 	close(std_save);
 	*token->code = 0;
-	if (!exec_node(root, node->right, env, token->code))
+	if (!exec_node(root, node->right, vars, token->code))
 		return (0);
 	return (1);
 }

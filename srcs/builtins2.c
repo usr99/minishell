@@ -6,13 +6,13 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 14:52:40 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:23:54 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 21:45:27 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	builtin_unset(char **argv, t_list **env)
+int	builtin_unset(char **argv, t_env *vars)
 {
 	int		i;
 
@@ -24,7 +24,8 @@ int	builtin_unset(char **argv, t_list **env)
 	i = 1;
 	while (argv[i])
 	{
-		delete_var(argv[i], env);
+		delete_var(argv[i], &vars->env);
+		delete_var(argv[i], &vars->export);
 		i++;
 	}
 	return (1);
@@ -51,7 +52,7 @@ int	builtin_env(char **argv, t_list **env)
 	return (1);
 }
 
-int	builtin_exit(t_btree *root, char **argv, t_list **env)
+int	builtin_exit(t_btree *root, char **argv, t_env *vars)
 {
 	int	nb_args;
 	int	exit_code;
@@ -67,7 +68,8 @@ int	builtin_exit(t_btree *root, char **argv, t_list **env)
 	else
 		exit_code = ft_atoi(argv[1]);
 	btree_clear(&root, &free_token);
-	ft_lstclear(env, &free);
+	ft_lstclear(&vars->env, &free);
+	ft_lstclear(&vars->export, &free);
 	free(argv);
 	exit(exit_code);
 }
