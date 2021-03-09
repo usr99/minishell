@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 16:13:28 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 18:12:26 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 16:25:05 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	my_dup(int fd1, int fd2, t_token *token)
 	if (dup_fd == -1)
 	{
 		*token->code = 1;
-		print_error(strerror(errno), "minishell");
+		print_error(strerror(errno), "minishell", NULL);
 	}
 	return (dup_fd);
 }
@@ -74,7 +74,7 @@ int	open_file(t_token *token, int *std_fd)
 	if (fd == -1)
 	{
 		*token->code = 1;
-		print_error(strerror(errno), "minishell");
+		print_error(strerror(errno), "minishell", NULL);
 	}
 	return (fd);
 }

@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 14:52:40 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 18:40:01 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 16:23:54 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	builtin_unset(char **argv, t_list **env)
 
 	if (how_many_arguments(argv) == 1)
 	{
-		print_error("not enough arguments", "unset");
+		print_error("not enough arguments", "unset", NULL);
 		return (-1);
 	}
 	i = 1;
@@ -38,7 +38,7 @@ int	builtin_env(char **argv, t_list **env)
 	i = 0;
 	if (how_many_arguments(argv) > 1)
 	{
-		print_error("too many arguments", "env");
+		print_error("too many arguments", "env", NULL);
 		return (-1);
 	}
 	lst = *env;
@@ -59,7 +59,7 @@ int	builtin_exit(t_btree *root, char **argv, t_list **env)
 	nb_args = how_many_arguments(argv);
 	if (nb_args > 2)
 	{
-		print_error("too many arguments", "exit");
+		print_error("too many arguments", "exit", NULL);
 		return (-1);
 	}
 	else if (nb_args == 1)

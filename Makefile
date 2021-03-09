@@ -7,7 +7,7 @@ SRC				= minishell.c environment.c lexer.c parser.c executor.c expander.c free.c
 OBJ_DIR			= objs/
 OBJ				= ${addprefix ${OBJ_DIR}, ${SRC:.c=.o}}
 CC				= gcc
-CFLAGS			= -g -Wall -Wextra #-Werror
+CFLAGS			= -g -Wall -Wextra -Werror
 
 ${OBJ_DIR}%.o:	srcs/%.c
 				${CC} ${CFLAGS} -I ${INCLUDE} -c $< -o $@

@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 16:14:33 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 20:54:53 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 16:24:42 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ int	handle_pipe(t_btree *root, t_btree *node, t_list **env)
 	{
 		*((t_token *)(node->item))->code = 1;
 		if (tmp == -1)
-			print_error("pipe error", "minishell");
+			print_error("pipe error", "minishell", NULL);
 		else
-			print_error("fork error", "minishell");
+			print_error("fork error", "minishell", NULL);
 		return (-1);
 	}
 	else if (pid == 0)

@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/16 14:33:29 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 21:05:58 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 16:44:06 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@
 **	MINISHELL FUNCTIONS
 */
 
-int				shell_loop(t_list *lst_env);
+int				shell_loop(t_env vars);
 void			handle_signal(int signal);
 void			print_prompt(void);
-void			print_error(char *message, char *name);
+void			print_error(char *message, char *name, char *cmd);
 
 /*
 **	ENVIRONMENT VARIABLES FUNCTIONS

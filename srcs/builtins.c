@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:44:56 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 16:50:14 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 16:23:25 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,19 @@ int	builtin_cd(char **argv, t_list **env)
 	i = how_many_arguments(argv);
 	if (i > 2)
 	{
-		print_error("too many arguments", "cd");
+		print_error("too many arguments", "cd", NULL);
 		return (-1);
 	}
 	else if (i < 2)
 	{
-		print_error("not enough arguments", "cd");
+		print_error("not enough arguments", "cd", NULL);
 		return (-1);
 	}
 	else
 	{
 		if (chdir(argv[1]) == -1)
 		{
-			print_error("can't open directory", "cd");
+			print_error("can't open directory", "cd", NULL);
 			return (-1);
 		}
 		return (1);
@@ -74,7 +74,7 @@ int	builtin_pwd(char **argv, t_list **env)
 	(void)env;
 	if (how_many_arguments(argv) > 1)
 	{
-		print_error("too many arguments", "pwd");
+		print_error("too many arguments", "pwd", NULL);
 		return (-1);
 	}
 	if (!get_pwd(&cwd))

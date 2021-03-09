@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 16:17:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 00:26:10 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/09 16:19:26 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int		exec_program(char **argv, char **envp)
 		binary = get_program_path(path, argv[0]);
 		if (!binary)
 		{
-			print_error("command not found", "minishell");
+			print_error("command not found", "minishell", argv[0]);
 			if (path)
 				ft_free_map(path);
 			return (-1);
@@ -81,13 +81,13 @@ int		fork_process(char *binary, char **argv, char **envp)
 
 	if (!check_binary(binary))
 	{
-		print_error("command not found", "minishell");
+		print_error("command not found", "minishell", argv[0]);
 		return (-1);
 	}
 	pid = fork();
 	if (pid == -1)
 	{
-		print_error("fork error", "minishell");
+		print_error("fork error", "minishell", NULL);
 		return (-1);
 	}
 	else if (pid == 0)
@@ -105,6 +105,6 @@ int		fork_process(char *binary, char **argv, char **envp)
 int		exec_in_child(char *binary, char **argv, char **envp)
 {
 	if (execve(binary, argv, envp) == -1)
-		print_error("execution failed", "minishell");
+		print_error("execution failed", "minishell", NULL);
 	exit(EXIT_FAILURE);
 }
