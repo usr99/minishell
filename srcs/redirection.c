@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 16:13:28 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 21:42:49 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/16 18:00:35 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,12 @@ int	handle_redirect(t_btree *root, t_btree *node, t_env *vars)
 		return (-1);
 	if (!exec_node(root, node->left, vars, token->code))
 		return (0);
-	close(fd);
-	if (my_dup(std_save, std_fd, token) == -1)
+	if (node->left && close_dup(fd, std_save, std_fd, token) == -1)
 		return (-1);
-	close(std_save);
-	*token->code = 0;
 	if (!exec_node(root, node->right, vars, token->code))
 		return (0);
+	if (!node->left && close_dup(fd, std_save, std_fd, token) == -1)
+		return (-1);
 	return (1);
 }
 
@@ -77,4 +76,14 @@ int	open_file(t_token *token, int *std_fd)
 		print_error(strerror(errno), "minishell", NULL);
 	}
 	return (fd);
+}
+
+int	close_dup(int fd, int save, int std, t_token *token)
+{
+	close(fd);
+	if (my_dup(save, std, token) == -1)
+		return (-1);
+	close(save);
+	*token->code = 0;
+	return (0);
 }

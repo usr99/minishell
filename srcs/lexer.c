@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/20 17:40:28 by mamartin          #+#    #+#             */
-/*   Updated: 2021/02/21 17:07:14 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/12 21:52:29 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,8 @@ t_list		*get_token(char *cmd, int *pos)
 	while (cmd[*pos] == ' ' && cmd[*pos])
 		(*pos)++;
 	type = get_token_type(cmd + *pos);
-	if (type == TK_SINGLE_QUOTE || type == TK_DOUBLE_QUOTE)
-		data = get_token_data(cmd + *pos, type);
-	else if (type == TK_WORD || type == TK_ENV_VAR)
-		data = get_token_data(cmd + *pos, 0);
+	if (type == TK_WORD)
+		data = get_token_data(cmd + *pos);
 	else if (type >= TK_INPUT && type <= TK_OUTPUT_APPEND)
 	{
 		(*pos)++;
@@ -59,7 +57,7 @@ t_list		*get_token(char *cmd, int *pos)
 			(*pos)++;
 		while (cmd[*pos] == ' ' && cmd[*pos])
 			(*pos)++;
-		data = get_token_data(cmd + *pos, 0);
+		data = get_token_data(cmd + *pos);
 	}
 	if (!data)
 		*pos += 1;
@@ -70,7 +68,7 @@ t_list		*get_token(char *cmd, int *pos)
 
 t_tk_type	get_token_type(char *cmd)
 {
-	if (ft_strchr("\'\"$|;<", *cmd))
+	if (ft_strchr("|;<", *cmd))
 		return (*cmd);
 	else if (*cmd == '>')
 	{
@@ -83,23 +81,26 @@ t_tk_type	get_token_type(char *cmd)
 		return (TK_WORD);
 }
 
-char		*get_token_data(char *cmd, char type)
+char		*get_token_data(char *cmd)
 {
 	char	*data;
+	int		is_quote;
 	int		i;
 
 	i = 1;
-	if (type != 0)
+	is_quote = 0;
+	if (cmd[0] == '\'' || cmd[0] == '\"')
+		is_quote = 1;
+	while ((!ft_strchr("|;<> ", cmd[i]) || is_quote) && cmd[i])
 	{
-		while ((cmd[i] != type || cmd[i - 1] == '\\') && cmd[i])
-			i++;
-		if (cmd[i] == type)
-			i++;
-	}
-	else
-	{
-		while (!ft_strchr("\'\"$|;<> ", cmd[i]) && cmd[i])
-			i++;
+		if (cmd[i] == '\'' || cmd[i] == '\"')
+		{
+			if (is_quote == 0)
+				is_quote = 1;
+			else
+				is_quote = 0;
+		}
+		i++;
 	}
 	data = ft_substr(cmd, 0, i);
 	return (data);
@@ -110,8 +111,7 @@ t_list		*create_token_link(t_tk_type type, char *data)
 	t_token	*token;
 	t_list	*new;
 
-	if ((type == 34 || type == 36 || type == 39 || !type ||
-		(type <= 60 && type >= 62)) && !data)
+	if ((!type || (type <= 60 && type >= 62)) && !data)
 		return (NULL);
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)

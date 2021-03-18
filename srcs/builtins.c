@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:44:56 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 22:37:14 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/18 19:43:18 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,16 @@ int	builtin_echo(char **argv)
 
 	i = 1;
 	newline = 1;
-	if (how_many_arguments(argv) > 1)
-	{
-		if (!ft_strncmp(argv[1], "-n", 2))
-		{
-			newline = 0;
-			i++;
-		}
-	}
 	while (argv[i])
 	{
-		ft_putstr_fd(argv[i], STDOUT_FILENO);
-		if (argv[i + 1])
-			ft_putchar_fd(' ', STDOUT_FILENO);
+		if (is_echo_option(argv[i]) == 0)
+			newline = 0;
+		else
+		{
+			ft_putstr_fd(argv[i], STDOUT_FILENO);
+			if (argv[i + 1])
+				ft_putchar_fd(' ', STDOUT_FILENO);
+		}
 		i++;
 	}
 	if (newline)
@@ -65,19 +62,14 @@ int	builtin_cd(char **argv)
 	}
 }
 
-int	builtin_pwd(char **argv)
+int	builtin_pwd(void)
 {
 	char	*cwd;
 
-	if (how_many_arguments(argv) > 1)
-	{
-		print_error("too many arguments", "pwd", NULL);
-		return (-1);
-	}
 	if (!get_pwd(&cwd))
 		return (0);
 	if (cwd)
-		printf("%s\n", cwd);
+		ft_putendl_fd(cwd, STDOUT_FILENO);
 	else
 	{
 		ft_putstr_fd("pwd: ", STDERR_FILENO);
@@ -96,7 +88,7 @@ int	builtin_export(char **argv, t_env *vars)
 	if (how_many_arguments(argv) == 1)
 	{
 		sort_alpha_lst(&vars->export);
-		builtin_env(argv, &vars->export);
+		print_export(vars->export);
 	}
 	else
 	{

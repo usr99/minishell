@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/07 16:30:10 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 22:42:19 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/15 23:14:36 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int		is_builtin(t_btree *root, char **argv, t_env *vars)
 	else if (ft_strncmp(argv[0], "cd", size) == 0)
 		return (builtin_cd(argv));
 	else if (ft_strncmp(argv[0], "pwd", size) == 0)
-		return (builtin_pwd(argv));
+		return (builtin_pwd());
 	else if (ft_strncmp(argv[0], "export", size) == 0)
 		return (builtin_export(argv, vars));
 	else if (ft_strncmp(argv[0], "unset", size) == 0)
@@ -109,6 +109,8 @@ int		create_var(char *arg, t_list *env)
 		str = ft_strdup(arg);
 	if (!str)
 		return (0);
+	if (check_existing_var(str, env) == 1)
+		return (1);
 	new = ft_lstnew(str);
 	if (!new)
 		return (0);

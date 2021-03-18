@@ -1,33 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   minishell_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/18 23:49:55 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/11 23:51:46 by mamartin         ###   ########.fr       */
+/*   Created: 2021/03/18 18:11:57 by mamartin          #+#    #+#             */
+/*   Updated: 2021/03/18 22:43:50 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft.h"
+#include "../includes/minishell.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+int		execute(char *cmd, t_env *vars)
 {
-	int		length;
-	char	*new;
+	t_btree	*ast;
+	int		ret;
 
-	if (!s1 && !s2)
-		return (NULL);
-	else if (!s1)
-		return (ft_strdup(s2));
-	else if (!s2)
-		return (ft_strdup(s1));
-	length = ft_strlen(s1) + ft_strlen(s2);
-	new = (char *)malloc(length + 1);
-	if (!new)
-		return (NULL);
-	ft_strlcpy(new, s1, ft_strlen(s1) + 1);
-	ft_strlcat(new, s2, length + 1);
-	return (new);
+	ast = read_cmd(cmd);
+	ret = exec_ast(ast, vars, &g_global.exit_code);
+	btree_clear(&ast, &free_token);
+	if (!ret)
+		return (-1);
+	return (0);
+}
+
+void	handle_signal_code(int signal)
+{
+	if (signal == SIGINT)
+		g_global.exit_code = 130;
 }

@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 15:28:24 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 22:11:38 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/13 23:37:29 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ t_list	*dup_env(char **env)
 	return (begin);
 }
 
-char	*get_environment_var(t_list *env, char *name, int *length)
+char	*get_environment_var(t_list *env, char *name, int *len)
 {
 	char	*varname;
 	int		i;
@@ -50,7 +50,7 @@ char	*get_environment_var(t_list *env, char *name, int *length)
 	if (*name == '$')
 	{
 		i = 1;
-		while (!ft_strchr("\'\"$|;<> \\", name[i]) && name[i])
+		while (!ft_strchr("\'\"$|;<> \\/", name[i]) && name[i])
 			i++;
 		while (env)
 		{
@@ -58,10 +58,10 @@ char	*get_environment_var(t_list *env, char *name, int *length)
 			varname = (char *)env->content;
 			while (varname[j] != '=' && varname[j])
 				j++;
-			if (!ft_strncmp(env->content, name + 1, j))
+			if (!ft_strncmp(varname, name + 1, j))
 			{
-				*length = i;
-				return (ft_strdup(env->content + i));
+				*len = i;
+				return (ft_strdup(varname + i));
 			}
 			env = env->next;
 		}
@@ -100,4 +100,14 @@ void	sort_alpha_lst(t_list **lst)
 		else
 			useless_func(&prev, &curr);
 	}
+}
+
+int		get_varname_length(char *var)
+{
+	int	length;
+
+	length = 0;
+	while (var[length] != '=' && var[length])
+		length++;
+	return (length);
 }

@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/20 17:45:35 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:41:40 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/18 22:26:02 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,10 @@
 typedef enum	e_tk_type
 {
 	TK_WORD,
-	TK_SINGLE_QUOTE = 39,
-	TK_DOUBLE_QUOTE = 34,
 	TK_INPUT = 60,
 	TK_OUTPUT,
 	TK_OUTPUT_APPEND,
 	TK_PIPE = 124,
-	TK_ENV_VAR = 36,
 	TK_SEMICOLON = 59,
 }				t_tk_type;
 
@@ -44,5 +41,11 @@ typedef struct	s_env
 	t_list		*env;
 	t_list		*export;
 }				t_env;
+
+typedef struct	s_global
+{
+	char		cmd[CMD_SIZE + 1];
+	int			exit_code;
+}				t_global;
 
 #endif

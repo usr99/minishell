@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 18:42:17 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 21:43:47 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/18 22:17:10 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,13 @@ int		handle_word(t_btree *root, t_btree *node, t_env *vars)
 		ret = exec_program(argv, envp);
 		free(envp);
 	}
+	else
+	{
+		*((t_token *)(node->item))->code = 0;
+		if (ret == -1)
+			*((t_token *)(node->item))->code = 1;
+	}
 	free(argv);
-	*((t_token *)(node->item))->code = 0;
-	if (ret == -1)
-		*((t_token *)(node->item))->code = 1;
 	return (ret);
 }
 

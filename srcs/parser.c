@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 23:54:01 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/06 00:07:08 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/12 01:46:59 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,7 @@ int		get_token_rank(t_token *token)
 
 int		is_operator(t_token *token)
 {
-	if (token->type == TK_WORD || token->type == TK_ENV_VAR)
-		return (0);
-	else if (token->type == TK_SINGLE_QUOTE || token->type == TK_DOUBLE_QUOTE)
+	if (token->type == TK_WORD)
 		return (0);
 	else
 		return (1);

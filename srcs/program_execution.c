@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 16:17:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 16:19:26 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/18 22:45:28 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int		exec_program(char **argv, char **envp)
 	char	*binary;
 	int		ret;
 
+	g_global.exit_code = 0;
 	if (!ft_strchr(argv[0], '/'))
 	{
 		path = get_path(envp);
@@ -84,8 +85,7 @@ int		fork_process(char *binary, char **argv, char **envp)
 		print_error("command not found", "minishell", argv[0]);
 		return (-1);
 	}
-	pid = fork();
-	if (pid == -1)
+	if ((pid = fork()) == -1)
 	{
 		print_error("fork error", "minishell", NULL);
 		return (-1);
@@ -94,16 +94,19 @@ int		fork_process(char *binary, char **argv, char **envp)
 		return (exec_in_child(binary, argv, envp));
 	else
 	{
+		signal(SIGINT, handle_signal_code);
 		waitpid(pid, &status, 0);
 		kill(pid, SIGTERM);
-		if (status != 0)
-			return (-1);
+		signal(SIGINT, handle_signal);
+		if (WEXITSTATUS(status) != 0)
+			g_global.exit_code = WEXITSTATUS(status);
 		return (1);
 	}
 }
 
 int		exec_in_child(char *binary, char **argv, char **envp)
 {
+	signal(SIGQUIT, SIG_DFL);
 	if (execve(binary, argv, envp) == -1)
 		print_error("execution failed", "minishell", NULL);
 	exit(EXIT_FAILURE);

@@ -6,140 +6,122 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 21:43:23 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/07 21:03:21 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/18 22:24:01 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int		expander(t_btree *ast, t_list *env, int code)
+int		expander(t_btree *ast, t_list *env)
 {
 	t_token	*token;
+	int		ret;
 
+	ret = 1;
 	if (!ast)
 		return (1);
 	token = ast->item;
-	if (token->type == TK_SINGLE_QUOTE || token->type == TK_DOUBLE_QUOTE)
-	{
-		if (!expand_quotes(token, env, code))
-			return (0);
-	}
-	else if (token->type >= 60 && token->type <= 62)
-	{
-		if (!expand_quotes(token, env, code))
-			return (0);
-	}
-	else if (token->type == TK_ENV_VAR)
-	{
-		if (!expand_dollar_sign(token, env, code))
-			return (0);
-		token->type = TK_WORD;
-	}
 	if (token->type == TK_WORD)
-		expander(ast->right, env, code);
-	return (1);
-}
-
-int		expand_quotes(t_token *token, t_list *env, int code)
-{
-	char	*tmp;
-
-	tmp = token->data;
-	if (tmp[0] == '\'' || tmp[0] == '\"')
+		ret = expand(token, env);
+	if (ret != 1)
+		return (ret);
+	if (token->type == TK_WORD)
 	{
-		if (tmp[0] == '\'')
-			token->data = ft_strtrim(token->data, "\'");
-		else if (tmp[0] == '\"')
-		{
-			token->data = ft_strtrim(token->data, "\"");
-			if (!expand_dollar_sign(token, env, code))
-				return (0);
-			expand_backslash(token);
-		}
-		free(tmp);
-		if (token->data == NULL)
-			return (0);
+		if ((ret = expander(ast->right, env)) != 1)
+			return (ret);
 	}
-	else if (!expand_dollar_sign(token, env, code))
-		return (0);
-	if (!is_operator(token))
-		token->type = TK_WORD;
 	return (1);
 }
 
-int		expand_dollar_sign(t_token *token, t_list *env, int code)
+int		expand(t_token *token, t_list *env)
 {
-	char	*var;
-	int		i;
+	int	ret;
+	int	i;
 
-	i = -1;
-	var = NULL;
-	while (token->data[++i])
+	i = 0;
+	ret = 1;
+	while (token->data[i])
 	{
-		if (token->data[i] == '$')
+		if (token->data[i] == '\'')
+			ret = expand_single_quotes(token, &i);
+		else if (token->data[i] == '\"')
+			ret = expand_double_quotes(token, env, &i, ft_strlen(token->data));
+		else if (token->data[i] == '$' && token->data[i + 1])
 		{
-			if (ft_strncmp(token->data + i, "$?", 2) == 0)
-			{
-				var = ft_itoa(code);
-				if (!var)
-					return (0);
-			}
-			if (!replace_env_var(token, var, i, env))
-				return (0);
+			token->data = expand_dollar_sign(token->data, env, &i);
 			if (!token->data)
 				return (0);
 		}
-		else if (token->data[i] == '\\' && token->data[i + 1] == '$')
-			i++;
-	}
-	return (1);
-}
-
-int		replace_env_var(t_token *token, char *var, int i, t_list *env)
-{
-	char	*new_data;
-	int		length;
-
-	if (var == NULL)
-		var = get_environment_var(env, token->data + i, &length);
-	else
-		length = 2;
-	if (var)
-	{
-		new_data = ft_strjoin(var, token->data + i + length);
-		if (!new_data)
-			return (0);
-		token->data[i] = '\0';
-		i += ft_strlen(var);
-		free(var);
-		var = new_data;
-		new_data = ft_strjoin(token->data, new_data);
-		free(var);
-		free(token->data);
-		token->data = new_data;
-	}
-	else
-		token->data = ft_clearstr(token->data);
-	return (1);
-}
-
-void	expand_backslash(t_token *token)
-{
-	char	*str;
-	int		i;
-
-	i = 0;
-	while (token->data[i])
-	{
-		if (token->data[i] == '\\')
-		{
-			if (ft_strchr("$\\\"", token->data[i + 1]))
-				token->data[i] = token->data[i + 1];
-			else if (token->data[i + 1] == 'n')
-				token->data[i] = '\n';
-			str = token->data + i + 2;
-			ft_strlcpy(token->data + i + 1, str, ft_strlen(str - 1));
-		}
+		if (ret != 1)
+			return (ret);
 		i++;
 	}
+	return (1);
+}
+
+char	*expand_dollar_sign(char *data, t_list *env, int *pos)
+{
+	char	*new_data;
+	char	*var;
+	int		length;
+
+	if (ft_strncmp(data + *pos, "$?", 2) == 0)
+	{
+		var = ft_itoa(g_global.exit_code);
+		length = 2;
+	}
+	else
+		var = get_environment_var(env, data + *pos, &length);
+	if (!(new_data = replace_env_var(data, var, *pos, length)))
+		return (NULL);
+	if (pos)
+		*pos += length;
+	free(data);
+	return (new_data);
+}
+
+char	*replace_env_var(char *data, char *var, int i, int length)
+{
+	char	*new_data;
+
+	if (var)
+	{
+		new_data = ft_strjoin(var, data + i + length);
+		if (!new_data)
+			return (NULL);
+		free(var);
+		data[i] = '\0';
+		var = new_data;
+		new_data = ft_strjoin(data, new_data);
+		if (!new_data)
+			return (NULL);
+		free(var);
+	}
+	else
+		new_data = ft_calloc(1, 1);
+	return (new_data);
+}
+
+char	*expand_backslash(char c)
+{
+	char	*str;
+
+	if (ft_strchr("$\\\"", c))
+	{
+		str = malloc(2);
+		if (!str)
+			return (NULL);
+		str[0] = c;
+		str[1] = '\0';
+	}
+	else
+	{
+		str = malloc(3);
+		if (!str)
+			return (NULL);
+		str[0] = '\\';
+		str[1] = c;
+		str[2] = '\0';
+	}
+	return (str);
 }

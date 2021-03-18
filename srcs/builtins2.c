@@ -6,7 +6,7 @@
 /*   By: mamartin <mamartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 14:52:40 by mamartin          #+#    #+#             */
-/*   Updated: 2021/03/09 21:45:27 by mamartin         ###   ########.fr       */
+/*   Updated: 2021/03/18 19:18:14 by mamartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	builtin_env(char **argv, t_list **env)
 	lst = *env;
 	while (lst)
 	{
-		printf("%s\n", (char *)lst->content);
+		ft_putendl_fd((char *)lst->content, STDOUT_FILENO);
 		lst = lst->next;
 		i++;
 	}
@@ -57,19 +57,14 @@ int	builtin_exit(t_btree *root, char **argv, t_env *vars)
 	int	nb_args;
 	int	exit_code;
 
+	ft_putendl_fd("exit", STDOUT_FILENO);
 	nb_args = how_many_arguments(argv);
-	if (nb_args > 2)
-	{
-		print_error("too many arguments", "exit", NULL);
-		return (-1);
-	}
-	else if (nb_args == 1)
+	if (nb_args == 1)
 		exit_code = EXIT_SUCCESS;
-	else
-		exit_code = ft_atoi(argv[1]);
-	btree_clear(&root, &free_token);
-	ft_lstclear(&vars->env, &free);
-	ft_lstclear(&vars->export, &free);
-	free(argv);
+	else if (nb_args > 1)
+		exit_code = check_numeric_value(argv, nb_args);
+	if (exit_code == -1)
+		return (-1);
+	destroy_all(root, argv, vars);
 	exit(exit_code);
 }
